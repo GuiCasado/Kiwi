@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquivo Histórico | Maiores Criminosos da História</title>
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --accent-red: #8b0000;
+            --text-light: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border-color: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace; /* Estilo máquina de escrever/arquivo */
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            padding: 2rem 1rem;
+            line-height: 1.6;
+        }
+
+        header {
+            max-width: 800px;
+            margin: 0 auto 3rem auto;
+            text-align: center;
+            border-bottom: 2px dashed var(--accent-red);
+            padding-bottom: 1.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+            display: flex;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 4px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-red);
+        }
+
+        .archive-grid {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .criminal-card {
+            background-color: var(--bg-card);
+            border-left: 5px solid var(--accent-red);
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 0 4px 4px 0;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .criminal-card:hover {
+            background-color: #252525;
+            transform: translateX(5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .criminal-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--text-light);
+        }
+
+        .criminal-alias {
+            font-size: 0.9rem;
+            color: var(--accent-red);
+            font-style: italic;
+        }
+
+        .criminal-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .criminal-desc {
+            font-size: 0.95rem;
+            color: #cccccc;
+            text-align: justify;
+        }
+
+        /* Mensagem quando nenhum resultado é encontrado */
+        .no-results {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 2rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Arquivo de Casos Notórios</h1>
+        <p>Registos de figuras criminosas proeminentes da história moderna</p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input" placeholder="Pesquisar por nome, alcunha ou crime..." onkeyup="searchCriminals()">
+    </div>
+
+    <div class="archive-grid" id="archiveGrid">
+        </div>
+
+    <div class="no-results" id="noResults">
+        Nenhum registo encontrado com estes critérios.
+    </div>
+
+    <script>
+        // Base de dados dos perfis criminosos (Históricos e Notórios)
+        const criminosos = [
+            {
+                nome: "Alphonse Gabriel Capone",
+                alcunha: '"Al Capone"',
+                periodo: "Décadas de 1920 - 1930",
+                local: "Chicago, EUA",
+                crimes: "Líder do crime organizado da máfia italiana durante a era da Lei Seca. Controlava redes clandestinas de contrabando de álcool, jogo ilegal e prostituição. Embora estivesse ligado a inúmeros homicídios (incluindo o Massacre de São Valentim), acabou por ser condenado em 1931 por evasão fiscal."
+            },
+            {
+                nome: "Pablo Emilio Escobar Gaviria",
+                alcunha: '"El Patrón"',
+                periodo: "Décadas de 1970 - 1993",
+                local: "Medellín, Colômbia",
+                crimes: "Fundador e líder do Cartel de Medellín, tornou-se o maior narcotraficante do mundo, chegando a controlar cerca de 80% da cocaína enviada para os EUA. O seu império utilizou o terrorismo, suborno e milhares de assassinatos de polícias, juízes e políticos para subjugar o governo colombiano."
+            },
+            {
+                nome: "Charles Milles Manson",
+                alcunha: '"Líder da Família Manson"',
+                periodo: "1969",
+                local: "Califórnia, EUA",
+                crimes: "Líder de uma seita que orquestrou uma série de assassinatos brutais em Los Angeles, incluindo o da atriz Sharon Tate. Manson não executou os crimes diretamente com as próprias mãos, mas usou manipulação psicológica e controlo mental para ordenar que os seus seguidores cometessem os massacres."
+            },
+            {
+                nome: "Ted Bundy",
+                alcunha: '"O Assassino Carismático"',
+                periodo: "1974 - 1978",
+                local: "Vários estados dos EUA",
+                crimes: "Um dos serial killers mais mediáticos do século XX. Utilizava o seu charme, boa aparência e falsas deficiências físicas para atrair, raptar e assassinar jovens mulheres. Antes da sua execução, confessou pelo menos 30 homicídios, embora o número real possa ser muito superior."
+            },
+            {
+                nome: "Joaquín Archivaldo Guzmán Loera",
+                alcunha: '"El Chapo"',
+                periodo: "Décadas de 1980 - 2016",
+                local: "Sinaloa, México",
+                crimes: "Antigo líder do Cartel de Sinaloa, uma das organizações de tráfico de droga mais poderosas e violentas do mundo. Foi responsável pela introdução de toneladas de estupefacientes a nível global e tornou-se mundialmente famoso pelas suas fugas espetaculares de prisões de máxima segurança mexicana através de túneis complexos."
+            }
+        ];
+
+        // Função para construir o layout interativo com os dados
+        function renderArchive() {
+            const grid = document.getElementById('archiveGrid');
+            grid.innerHTML = '';
+
+            criminosos.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'criminal-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="criminal-name">${c.nome}</span>
+                        <span class="criminal-alias">${c.alcunha}</span>
+                    </div>
+                    <div class="criminal-meta">
+                        Atividade: ${c.periodo} | Base: ${c.local}
+                    </div>
+                    <p class="criminal-desc">${c.crimes}</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Função de Pesquisa em Tempo Real
+        function searchCriminals() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.getElementsByClassName('criminal-card');
+            let foundAny = false;
+
+            for (let i = 0; i < cards.length; i++) {
+                const cardText = cards[i].innerText.toLowerCase();
+                
+                // Se o texto digitado existir dentro do cartão, mantém visível
+                if (cardText.includes(input)) {
+                    cards[i].style.display = "block";
+                    foundAny = true;
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+
+            // Exibe mensagem de aviso caso a pesquisa não encontre nada
+            const noResults = document.getElementById('noResults');
+            noResults.style.display = foundAny ? "none" : "block";
+        }
+
+        // Inicializa o arquivo ao carregar a página
+        renderArchive();
+    </script>
+</body>
+</html>

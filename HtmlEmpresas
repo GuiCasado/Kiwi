@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maiores Empresas do Mundo | Tabela Interativa</title>
+    <style>
+        :root {
+            --bg-body: #f8f9fa;
+            --bg-card: #ffffff;
+            --primary: #212529;
+            --accent: #007bff;
+            --text-dark: #333333;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Barra de Pesquisa */
+        .search-box {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus {
+            border-color: var(--accent);
+        }
+
+        /* Tabela Responsiva */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f1f3f5;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        th:hover {
+            background-color: #e9ecef;
+        }
+
+        /* Ícone indicador de ordenação */
+        th::after {
+            content: ' ↕';
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Alinhamento de Imagens e Logos */
+        .company-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 35px;
+            height: 35px;
+            object-fit: contain;
+            border-radius: 6px;
+            background: #f8f9fa;
+            padding: 4px;
+            border: 1px solid #eee;
+        }
+
+        .company-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .badge-sector {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .market-cap {
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 1.05rem;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Principais Empresas Globais</h1>
+            <p>Uma visão interativa das maiores corporações do mercado financeiro mundial</p>
+        </header>
+
+        <input type="text" id="searchBox" class="search-box" placeholder="Pesquise por empresa ou setor..." onkeyup="filterTable()">
+
+        <div class="table-responsive">
+            <table id="companyTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Empresa</th>
+                        <th onclick="sortTable(1)">Setor</th>
+                        <th onclick="sortTable(2)">Valor de Mercado (Estimado)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    </tbody>
+            </table>
+        </div>
+        
+        <div id="noResults" class="no-results">Nenhuma empresa corresponde à pesquisa.</div>
+    </div>
+
+    <script>
+        // Dados de referência global das maiores empresas
+        const empresas = [
+            { nome: "Microsoft", logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo_%282012%29.svg", setor: "Tecnologia", valor: 3.10, valorTexto: "$3.10 Triliões" },
+            { nome: "Apple", logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg", setor: "Tecnologia / Eletrónicos", valor: 2.95, valorTexto: "$2.95 Triliões" },
+            { nome: "NVIDIA", logo: "https://upload.wikimedia.org/wikipedia/commons/2/21/Nvidia_logo.svg", setor: "Semicondutores / IA", valor: 2.80, valorTexto: "$2.80 Triliões" },
+            { nome: "Alphabet (Google)", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_\"G\"_logo.svg", setor: "Tecnologia / Internet", valor: 2.15, valorTexto: "$2.15 Triliões" },
+            { nome: "Amazon", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg", setor: "E-Commerce / Cloud", valor: 1.85, valorTexto: "$1.85 Triliões" },
+            { nome: "Saudi Aramco", logo: "https://upload.wikimedia.org/wikipedia/commons/8/82/Saudi_Aramco_logo.svg", setor: "Petróleo e Gás", valor: 1.80, valorTexto: "$1.80 Triliões" },
+            { nome: "Meta (Facebook)", logo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg", setor: "Redes Sociais", valor: 1.20, valorTexto: "$1.20 Triliões" },
+            { nome: "Berkshire Hathaway", logo: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Berkshire_Hathaway_logo.svg", setor: "Investimentos / Conglomerado", valor: 0.88, valorTexto: "$880 Bilhões" }
+        ];
+
+        // Função para preencher a tabela
+        function renderTable(dados) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            dados.forEach(emp => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div class="company-info">
+                            <img src="${emp.logo}" alt="Logo da ${emp.nome}" class="logo">
+                            <span class="company-name">${emp.nome}</span>
+                        </div>
+                    </td>
+                    <td><span class="badge-sector">${emp.setor}</span></td>
+                    <td class="market-cap" data-value="${emp.valor}">${emp.valorTexto}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Função de pesquisa
+        function filterTable() {
+            const input = document.getElementById('searchBox').value.toLowerCase();
+            const rows = document.querySelectorAll('#tableBody tr');
+            let hasResults = false;
+
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                if (text.includes(input)) {
+                    row.style.display = '';
+                    hasResults = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            document.getElementById('noResults').style.display = hasResults ? 'none' : 'block';
+        }
+
+        // Função de ordenação
+        let sortDirection = false;
+        function sortTable(columnIndex) {
+            sortDirection = !sortDirection;
+            
+            empresas.sort((a, b) => {
+                let valA, valB;
+
+                if (columnIndex === 0) {
+                    valA = a.nome.toLowerCase();
+                    valB = b.nome.toLowerCase();
+                } else if (columnIndex === 1) {
+                    valA = a.setor.toLowerCase();
+                    valB = b.setor.toLowerCase();
+                } else if (columnIndex === 2) {
+                    valA = a.valor;
+                    valB = b.valor;
+                }
+
+                if (valA < valB) return sortDirection ? -1 : 1;
+                if (valA > valB) return sortDirection ? 1 : -1;
+                return 0;
+            });
+
+            renderTable(empresas);
+            filterTable(); // Mantém o filtro ativo se o utilizador estiver a pesquisar
+        }
+
+        // Inicializar a tabela
+        renderTable(empresas);
+    </script>
+</body>
+</html>
